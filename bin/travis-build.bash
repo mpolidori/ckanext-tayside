@@ -5,7 +5,7 @@ echo "This is travis-build.bash..."
 
 echo "Installing the packages that CKAN requires..."
 sudo apt-get update -qq
-sudo apt-get install postgresql-$PGVERSION solr-jetty
+sudo apt-get install solr-jetty
 
 echo "Installing CKAN and its Python dependencies..."
 git clone https://github.com/ckan/ckan
@@ -19,7 +19,7 @@ pip install -r dev-requirements.txt
 cd -
 
 echo "Setting up Solr..."
-echo "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8987\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty
+echo "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8983\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty
 sudo cp ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
 sudo service jetty restart
 

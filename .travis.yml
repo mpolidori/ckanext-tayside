@@ -13,6 +13,5 @@ install:
     - pip install coveralls
 script:
   - sh bin/travis-run.sh
-  - pycodestyle --count ./ckanext/tayside
 after_success:
     - coveralls
