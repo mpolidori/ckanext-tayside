@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 echo "This is travis-build.bash..."
 
@@ -33,6 +34,7 @@ then
 fi
 
 python setup.py develop
+sed -i 's/psycopg2==2.4.5/psycopg2==2.7.3.2/' requirements.txt
 if [ -f requirements-py2.txt ]
 then
     pip install -r requirements-py2.txt
