@@ -43,9 +43,9 @@ sed -i 's/psycopg2==2.4.5/psycopg2==2.7.3.2/' requirements.txt
 pip install -r requirements.txt
 pip install -r dev-requirements.txt
 cd -
-
-ls
-ls ckan/ckan/config
+pwd
+ls -la
+ls -la ckan/ckan/config
 
 echo "Setting up Solr..."
 echo "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8983\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty

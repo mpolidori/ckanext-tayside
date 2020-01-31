@@ -2,7 +2,7 @@
 
 nosetests --ckan \
           --nologcapture \
-          --with-pylons=test.travis.ini \
+          --with-pylons=test.ini \
           --with-coverage \
           --cover-package=ckanext.tayside \
           --cover-inclusive \
