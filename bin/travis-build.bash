@@ -26,44 +26,40 @@ then
     pip install -r requirement-setuptools.txt
 fi
 
-python setup.py develop
-
-# TODO: remove once 2.5.3 is relesed
-# Pin this as newer versions installed by RDFLib give setuptools troubles
-pip install "html5lib==0.9999999"
-
 if [ $CKANVERSION == '2.7' ]
 then
     echo "Installing setuptools"
     pip install setuptools==39.0.1
 fi
 
-# Travis has an issue with older version of psycopg2 (2.4.5)
-sed -i 's/psycopg2==2.4.5/psycopg2==2.7.3.2/' requirements.txt
-pip install -r requirements.txt
+python setup.py develop
+if [ -f requirements-py2.txt ]
+then
+    pip install -r requirements-py2.txt
+else
+    pip install -r requirements.txt
+fi
 pip install -r dev-requirements.txt
 cd -
-pwd
-ls -la
-ls -la ckan/ckan/config
-
-echo "Setting up Solr..."
-echo "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8983\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty
-sudo cp ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
-sudo service jetty restart
-
-cat /etc/default/jetty
 
 echo "Creating the PostgreSQL user and database..."
 sudo -u postgres psql -c "CREATE USER ckan_default WITH PASSWORD 'pass';"
 sudo -u postgres psql -c 'CREATE DATABASE ckan_test WITH OWNER ckan_default;'
+
+echo "Setting up Solr..."
+# Solr is multicore for tests on ckan master, but it's easier to run tests on
+# Travis single-core. See https://github.com/ckan/ckan/issues/2972
+sed -i -e 's/solr_url.*/solr_url = http:\/\/127.0.0.1:8983\/solr/' ckan/test-core.ini
+printf "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8983\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty
+sudo cp ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
+sudo service jetty restart
 
 echo "Initialising the database..."
 cd ckan
 paster db init -c test-core.ini
 cd -
 
-echo "Installing ckanext-tayside and its requirements..."
+echo "Installing ckanext-hierarchy and its requirements..."
 python setup.py develop
 pip install -r dev-requirements.txt
 pip install -r requirements.txt
@@ -71,27 +67,5 @@ pip install -r requirements.txt
 echo "Moving test.ini into a subdir..."
 mkdir subdir
 mv test.ini subdir
-
-echo "Installing ckanext-googleanalytics and its requirements..."
-git clone https://github.com/ckan/ckanext-googleanalytics
-cd ckanext-googleanalytics
-python setup.py develop
-pip install -r requirements.txt
-pip install oauth2client
-cd -
-
-echo "Installing ckanext-report..."
-git clone https://github.com/datagovuk/ckanext-report
-cd ckanext-report
-python setup.py develop
-cd -
-
-echo "Installing ckanext-archiver and its requirements..."
-git clone https://github.com/ViderumGlobal/ckanext-archiver
-cd ckanext-archiver
-git checkout v1.0.4-ckan-2.7
-python setup.py develop
-pip install -r requirements.txt
-cd -
 
 echo "travis-build.bash is done."
