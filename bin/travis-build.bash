@@ -70,4 +70,26 @@ echo "Moving test.ini into a subdir..."
 mkdir subdir
 mv test.ini subdir
 
+echo "Installing ckanext-googleanalytics and its requirements..."
+git clone https://github.com/ckan/ckanext-googleanalytics
+cd ckanext-googleanalytics
+python setup.py develop
+pip install -r requirements.txt
+pip install oauth2client
+cd -
+
+echo "Installing ckanext-report..."
+git clone https://github.com/datagovuk/ckanext-report
+cd ckanext-report
+python setup.py develop
+cd -
+
+echo "Installing ckanext-archiver and its requirements..."
+git clone https://github.com/ViderumGlobal/ckanext-archiver
+cd ckanext-archiver
+git checkout v1.0.4-ckan-2.7
+python setup.py develop
+pip install -r requirements.txt
+cd -
+
 echo "travis-build.bash is done."
