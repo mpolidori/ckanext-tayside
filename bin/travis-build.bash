@@ -6,6 +6,12 @@ echo "This is travis-build.bash..."
 echo "Installing the packages that CKAN requires..."
 sudo apt-get update -qq
 sudo apt-get install solr-jetty
+
+echo "Setting up Solr..."
+echo "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8983\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty
+sudo cp ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
+sudo service jetty restart
+
 cat /etc/default/jetty
 
 echo "Installing CKAN and its Python dependencies..."
@@ -44,11 +50,6 @@ sed -i 's/psycopg2==2.4.5/psycopg2==2.7.3.2/' requirements.txt
 pip install -r requirements.txt
 pip install -r dev-requirements.txt
 cd -
-
-echo "Setting up Solr..."
-echo "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8983\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty
-sudo cp ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
-sudo service jetty restart
 
 echo "Creating the PostgreSQL user and database..."
 sudo -u postgres psql -c "CREATE USER ckan_default WITH PASSWORD 'pass';"
