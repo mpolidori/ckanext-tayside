@@ -10,8 +10,34 @@ sudo apt-get install solr-jetty
 echo "Installing CKAN and its Python dependencies..."
 git clone https://github.com/ckan/ckan
 cd ckan
-git checkout ckan-2.7.0
+if [ $CKANVERSION == 'master' ]
+then
+    echo "CKAN version: master"
+else
+    CKAN_TAG=$(git tag | grep ^ckan-$CKANVERSION | sort --version-sort | tail -n 1)
+    git checkout $CKAN_TAG
+    echo "CKAN version: ${CKAN_TAG#ckan-}"
+fi
+
+# install the recommended version of setuptools
+if [ -f requirement-setuptools.txt ]
+then
+    echo "Updating setuptools..."
+    pip install -r requirement-setuptools.txt
+fi
+
 python setup.py develop
+
+# TODO: remove once 2.5.3 is relesed
+# Pin this as newer versions installed by RDFLib give setuptools troubles
+pip install "html5lib==0.9999999"
+
+if [ $CKANVERSION == '2.7' ]
+then
+    echo "Installing setuptools"
+    pip install setuptools==39.0.1
+fi
+
 # Travis has an issue with older version of psycopg2 (2.4.5)
 sed -i 's/psycopg2==2.4.5/psycopg2==2.7.3.2/' requirements.txt
 pip install -r requirements.txt
