@@ -5,7 +5,7 @@ nosetests --ckan \
           --nologcapture \
           --with-pylons=subdir/test.ini \
           --with-coverage \
-          --cover-package=ckanext.hierarchy \
+          --cover-package=ckanext.tayside \
           --cover-inclusive \
           --cover-erase \
           --cover-tests
